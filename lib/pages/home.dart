@@ -350,7 +350,9 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            popularDiets[index].boxIsSelected = true;
+                          },
                           child: Container(
                             width: 25,
                             padding: const EdgeInsets.all(6),
