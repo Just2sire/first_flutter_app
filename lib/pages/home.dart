@@ -16,6 +16,15 @@ class _HomePageState extends State<HomePage> {
   List<DietModel> diets = [];
   List<PopularDietsModel> popularDiets = [];
 
+  TextEditingController _searchController = TextEditingController();
+  List<CategoryModel> searchCategories = [];
+  String search = "";
+
+  void updateSearchResult() {
+    searchCategories =
+        categories.where((element) => element.name.contains(search)).toList();
+  }
+
   void _getCategories() {
     categories = CategoryModel.getCategories();
   }
@@ -33,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     _getCategories();
     _getDiets();
     _getPopularDiets();
+    searchCategories = categories;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,6 +96,7 @@ class _HomePageState extends State<HomePage> {
                   )
             ]),
             child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -97,15 +108,23 @@ class _HomePageState extends State<HomePage> {
                       // borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        'assets/icons/search_icon.svg',
-                        width: 10,
-                        height: 10,
+                    prefixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          search = _searchController.text;
+                          updateSearchResult();
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          'assets/icons/search_icon.svg',
+                          width: 10,
+                          height: 10,
+                        ),
                       ),
                     ),
-                    suffixIcon: Container(
+                    suffixIcon: SizedBox(
                       width: 100,
                       child: IntrinsicHeight(
                           child: Row(
@@ -132,6 +151,7 @@ class _HomePageState extends State<HomePage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Text("The search: ${search.isNotEmpty ? search : 'Rien'}"),
               const Padding(
                 padding: EdgeInsets.only(left: 30, top: 20),
                 child: Text(
@@ -147,12 +167,13 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  itemCount: categories.length,
+                  itemCount: searchCategories.length,
                   itemBuilder: (context, index) {
                     return Container(
                       width: 100,
                       decoration: BoxDecoration(
-                          color: categories[index].boxColor.withOpacity(0.3),
+                          color:
+                              searchCategories[index].boxColor.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(16)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -164,11 +185,11 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.white, shape: BoxShape.circle),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child:
-                                  SvgPicture.asset(categories[index].iconPath),
+                              child: SvgPicture.asset(
+                                  searchCategories[index].iconPath),
                             ),
                           ),
-                          Text(categories[index].name,
+                          Text(searchCategories[index].name,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w400, fontSize: 15))
                         ],
